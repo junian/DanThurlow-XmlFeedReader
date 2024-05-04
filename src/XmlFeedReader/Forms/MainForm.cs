@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using XmlFeedReader.Properties;
 
 namespace XmlFeedReader.Forms
 {
@@ -15,6 +16,7 @@ namespace XmlFeedReader.Forms
         public MainForm()
         {
             InitializeComponent();
+            this.Icon = Resources.Favicon;
         }
     }
 }

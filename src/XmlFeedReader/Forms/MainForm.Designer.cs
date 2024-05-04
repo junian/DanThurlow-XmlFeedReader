@@ -1,4 +1,4 @@
-﻿namespace XmlFeedReader
+﻿namespace XmlFeedReader.Forms
 {
     partial class MainForm
     {

@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace XmlFeedReader
+namespace XmlFeedReader.Forms
 {
     public partial class MainForm : Form
     {

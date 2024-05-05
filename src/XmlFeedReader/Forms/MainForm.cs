@@ -49,6 +49,8 @@ namespace XmlFeedReader.Forms
                 this.Bind(ViewModel, vm => vm.StartDescriptions, view => view.textBoxStartDescriptions.Text);
                 this.Bind(ViewModel, vm => vm.EndDescriptions, view => view.textBoxEndDescriptions.Text);
 
+                this.BindCommand(ViewModel, vm => vm.SaveSettingsCommand, view => view.buttonSaveSettings);
+
 
             });
 

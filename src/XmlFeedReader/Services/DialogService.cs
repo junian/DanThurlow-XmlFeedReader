@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Juniansoft.MvvmReady;
+using Splat;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +11,25 @@ namespace XmlFeedReader.Services
 {
     public class DialogService
     {
+        private readonly AssemblyService _assemblyService;
+        public DialogService() 
+        { 
+            _assemblyService = ServiceLocator.Current.Get<AssemblyService>();
+        }
 
+        public Task ShowMessageAsync(string caption)
+        {
+            ShowMessageBox(caption);
+            return Task.CompletedTask;
+        }
+
+        public void ShowMessageBox(string text)
+        {
+            MessageBox.Show(
+                owner: Program.MainForm, 
+                text: text, 
+                caption: _assemblyService.AssemblyProduct);
+        }
         public Task<string> ShowFolderBrowserDialogAsync()
         {
             return Task.FromResult(ShowFolderBrowserDialog());

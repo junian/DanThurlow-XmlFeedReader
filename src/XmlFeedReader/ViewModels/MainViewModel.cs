@@ -36,6 +36,8 @@ namespace XmlFeedReader.ViewModels
 
             SelectRootFolderCommand = ReactiveCommand.CreateFromTask(SelectRootFolderAsync);
             OpenRootFolderCommand = ReactiveCommand.Create(() => OpenFolder(OutputRootFolder));
+
+            SaveSettingsCommand = ReactiveCommand.CreateFromTask(SaveSettingsAsync);
         }
 
         private string _appTitle;
@@ -55,8 +57,12 @@ namespace XmlFeedReader.ViewModels
         private string _feedUrl;
         public string FeedUrl
         {
-            get => _feedUrl;
-            set => this.RaiseAndSetIfChanged(ref _feedUrl, value);
+            get => Settings.Default.FeedUrl;
+            set
+            {
+                Settings.Default.FeedUrl = value;
+                this.RaisePropertyChanged();
+            }
         }
 
         private string _outputRootFolder;
@@ -85,6 +91,13 @@ namespace XmlFeedReader.ViewModels
         {
             get => _endDescriptions; 
             set => this.RaiseAndSetIfChanged(ref _endDescriptions, value);
+        }
+
+        public ICommand SaveSettingsCommand { get; private set; }
+        private async Task SaveSettingsAsync()
+        {
+            Settings.Default.Save();
+            await _dialogService.ShowMessageAsync("Settings saved succesfully!");
         }
 
         public ICommand OpenRootFolderCommand { get; private set; }

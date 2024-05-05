@@ -43,9 +43,9 @@
             this.textBoxFeedUrl = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBoxProgess = new System.Windows.Forms.GroupBox();
-            this.progressBar = new System.Windows.Forms.ProgressBar();
             this.textBoxLog = new System.Windows.Forms.RichTextBox();
-            this.buttonProcess = new System.Windows.Forms.Button();
+            this.buttonGetProducts = new System.Windows.Forms.Button();
+            this.progressBarGetProducts = new System.Windows.Forms.ProgressBar();
             this.groupBoxSettings.SuspendLayout();
             this.groupBoxProgess.SuspendLayout();
             this.SuspendLayout();
@@ -205,22 +205,15 @@
             this.groupBoxProgess.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBoxProgess.Controls.Add(this.progressBar);
+            this.groupBoxProgess.Controls.Add(this.progressBarGetProducts);
+            this.groupBoxProgess.Controls.Add(this.buttonGetProducts);
             this.groupBoxProgess.Controls.Add(this.textBoxLog);
-            this.groupBoxProgess.Controls.Add(this.buttonProcess);
             this.groupBoxProgess.Location = new System.Drawing.Point(12, 308);
             this.groupBoxProgess.Name = "groupBoxProgess";
             this.groupBoxProgess.Size = new System.Drawing.Size(720, 281);
             this.groupBoxProgess.TabIndex = 1;
             this.groupBoxProgess.TabStop = false;
             this.groupBoxProgess.Text = "Progress";
-            // 
-            // progressBar
-            // 
-            this.progressBar.Location = new System.Drawing.Point(117, 26);
-            this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(597, 23);
-            this.progressBar.TabIndex = 15;
             // 
             // textBoxLog
             // 
@@ -235,15 +228,24 @@
             this.textBoxLog.TabIndex = 14;
             this.textBoxLog.Text = "";
             // 
-            // buttonProcess
+            // buttonGetProducts
             // 
-            this.buttonProcess.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonProcess.Location = new System.Drawing.Point(6, 19);
-            this.buttonProcess.Name = "buttonProcess";
-            this.buttonProcess.Size = new System.Drawing.Size(105, 40);
-            this.buttonProcess.TabIndex = 13;
-            this.buttonProcess.Text = "Process";
-            this.buttonProcess.UseVisualStyleBackColor = true;
+            this.buttonGetProducts.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonGetProducts.Location = new System.Drawing.Point(9, 19);
+            this.buttonGetProducts.Name = "buttonGetProducts";
+            this.buttonGetProducts.Size = new System.Drawing.Size(171, 40);
+            this.buttonGetProducts.TabIndex = 15;
+            this.buttonGetProducts.Text = "Get Products ";
+            this.buttonGetProducts.UseVisualStyleBackColor = true;
+            // 
+            // progressBarGetProducts
+            // 
+            this.progressBarGetProducts.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressBarGetProducts.Location = new System.Drawing.Point(186, 27);
+            this.progressBarGetProducts.Name = "progressBarGetProducts";
+            this.progressBarGetProducts.Size = new System.Drawing.Size(528, 23);
+            this.progressBarGetProducts.TabIndex = 17;
             // 
             // MainForm
             // 
@@ -279,8 +281,8 @@
         private System.Windows.Forms.Button buttonSelectOutputFolder;
         private System.Windows.Forms.Button buttonSaveSettings;
         private System.Windows.Forms.GroupBox groupBoxProgess;
-        private System.Windows.Forms.ProgressBar progressBar;
         private System.Windows.Forms.RichTextBox textBoxLog;
-        private System.Windows.Forms.Button buttonProcess;
+        private System.Windows.Forms.ProgressBar progressBarGetProducts;
+        private System.Windows.Forms.Button buttonGetProducts;
     }
 }

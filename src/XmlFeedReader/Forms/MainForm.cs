@@ -46,8 +46,8 @@ namespace XmlFeedReader.Forms
 
                 this.Bind(ViewModel, vm => vm.IsPriceRounding, view => view.checkBoxPriceRounding.Checked);
 
-                this.Bind(ViewModel, vm => vm.StartDescriptions, view => view.textBoxStartDescriptions.Text);
-                this.Bind(ViewModel, vm => vm.EndDescriptions, view => view.textBoxEndDescriptions.Text);
+                this.Bind(ViewModel, vm => vm.DescriptionStart, view => view.textBoxStartDescriptions.Text);
+                this.Bind(ViewModel, vm => vm.DescriptionEnd, view => view.textBoxEndDescriptions.Text);
 
                 this.BindCommand(ViewModel, vm => vm.SaveSettingsCommand, view => view.buttonSaveSettings);
 

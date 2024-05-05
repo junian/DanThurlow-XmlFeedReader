@@ -54,7 +54,6 @@ namespace XmlFeedReader.ViewModels
             set => this.RaiseAndSetIfChanged(ref _appIcon, value);
         }
 
-        private string _feedUrl;
         public string FeedUrl
         {
             get => Settings.Default.FeedUrl;
@@ -65,32 +64,44 @@ namespace XmlFeedReader.ViewModels
             }
         }
 
-        private string _outputRootFolder;
         public string OutputRootFolder
         {
-            get => _outputRootFolder;
-            set => this.RaiseAndSetIfChanged(ref _outputRootFolder, value);
+            get => Settings.Default.OutputFolder;
+            set
+            {
+                Settings.Default.OutputFolder = value;
+                this.RaisePropertyChanged();
+            }
         }
 
-        private bool _isPriceRounding;
         public bool IsPriceRounding
         {
-            get => _isPriceRounding;
-            set => this.RaiseAndSetIfChanged(ref _isPriceRounding, value);
+            get => Settings.Default.IsPriceRounding;
+            set
+            {
+                Settings.Default.IsPriceRounding = value;
+                this.RaisePropertyChanged();
+            }
         }
 
-        private string _startDescriptions;
-        public string StartDescriptions
+        public string DescriptionStart
         {
-            get => _startDescriptions;
-            set => this.RaiseAndSetIfChanged(ref _startDescriptions, value);
+            get => Settings.Default.DescriptionStart;
+            set
+            {
+                Settings.Default.DescriptionStart = value;
+                this.RaisePropertyChanged();
+            }
         }
 
-        private string _endDescriptions;
-        public string EndDescriptions
+        public string DescriptionEnd
         {
-            get => _endDescriptions; 
-            set => this.RaiseAndSetIfChanged(ref _endDescriptions, value);
+            get => Settings.Default.DescriptionEnd; 
+            set
+            {
+                Settings.Default.DescriptionEnd = value;
+                this.RaisePropertyChanged();
+            }
         }
 
         public ICommand SaveSettingsCommand { get; private set; }

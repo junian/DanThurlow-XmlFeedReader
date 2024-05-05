@@ -38,8 +38,17 @@ namespace XmlFeedReader.Forms
                 this.OneWayBind(ViewModel, vm => vm.AppTitle, view => view.Text);
                 this.OneWayBind(ViewModel, vm => vm.AppIcon, view => view.Icon);
 
+                this.Bind(ViewModel, vm => vm.FeedUrl, view => view.textBoxFeedUrl.Text);
+                this.Bind(ViewModel, vm => vm.OutputRootFolder, view => view.textBoxOutputFolder.Text);
+
                 this.BindCommand(ViewModel, vm => vm.SelectRootFolderCommand, view => view.buttonSelectOutputFolder);
                 this.BindCommand(ViewModel, vm => vm.OpenRootFolderCommand, view => view.buttonOpenOutputFolder);
+
+                this.Bind(ViewModel, vm => vm.IsPriceRounding, view => view.checkBoxPriceRounding.Checked);
+
+                this.Bind(ViewModel, vm => vm.StartDescriptions, view => view.textBoxStartDescriptions.Text);
+                this.Bind(ViewModel, vm => vm.EndDescriptions, view => view.textBoxEndDescriptions.Text);
+
 
             });
 

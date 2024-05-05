@@ -32,22 +32,22 @@
             this.buttonSaveSettings = new System.Windows.Forms.Button();
             this.buttonOpenOutputFolder = new System.Windows.Forms.Button();
             this.buttonSelectOutputFolder = new System.Windows.Forms.Button();
-            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.textBoxEndDescriptions = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
-            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.textBoxStartDescriptions = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.checkBoxPriceRounding = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
             this.textBoxOutputFolder = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.textBoxFeedUrl = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.buttonProcess = new System.Windows.Forms.Button();
-            this.richTextBoxLog = new System.Windows.Forms.RichTextBox();
+            this.groupBoxProgess = new System.Windows.Forms.GroupBox();
             this.progressBar = new System.Windows.Forms.ProgressBar();
+            this.textBoxLog = new System.Windows.Forms.RichTextBox();
+            this.buttonProcess = new System.Windows.Forms.Button();
             this.groupBoxSettings.SuspendLayout();
-            this.groupBox1.SuspendLayout();
+            this.groupBoxProgess.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBoxSettings
@@ -57,15 +57,15 @@
             this.groupBoxSettings.Controls.Add(this.buttonSaveSettings);
             this.groupBoxSettings.Controls.Add(this.buttonOpenOutputFolder);
             this.groupBoxSettings.Controls.Add(this.buttonSelectOutputFolder);
-            this.groupBoxSettings.Controls.Add(this.textBox3);
+            this.groupBoxSettings.Controls.Add(this.textBoxEndDescriptions);
             this.groupBoxSettings.Controls.Add(this.label5);
-            this.groupBoxSettings.Controls.Add(this.textBox2);
+            this.groupBoxSettings.Controls.Add(this.textBoxStartDescriptions);
             this.groupBoxSettings.Controls.Add(this.label4);
             this.groupBoxSettings.Controls.Add(this.checkBoxPriceRounding);
             this.groupBoxSettings.Controls.Add(this.label3);
             this.groupBoxSettings.Controls.Add(this.textBoxOutputFolder);
             this.groupBoxSettings.Controls.Add(this.label2);
-            this.groupBoxSettings.Controls.Add(this.textBox1);
+            this.groupBoxSettings.Controls.Add(this.textBoxFeedUrl);
             this.groupBoxSettings.Controls.Add(this.label1);
             this.groupBoxSettings.Location = new System.Drawing.Point(12, 12);
             this.groupBoxSettings.Name = "groupBoxSettings";
@@ -105,16 +105,16 @@
             this.buttonSelectOutputFolder.Text = "...";
             this.buttonSelectOutputFolder.UseVisualStyleBackColor = true;
             // 
-            // textBox3
+            // textBoxEndDescriptions
             // 
-            this.textBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.textBoxEndDescriptions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox3.Location = new System.Drawing.Point(117, 190);
-            this.textBox3.Multiline = true;
-            this.textBox3.Name = "textBox3";
-            this.textBox3.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox3.Size = new System.Drawing.Size(474, 85);
-            this.textBox3.TabIndex = 9;
+            this.textBoxEndDescriptions.Location = new System.Drawing.Point(117, 190);
+            this.textBoxEndDescriptions.Multiline = true;
+            this.textBoxEndDescriptions.Name = "textBoxEndDescriptions";
+            this.textBoxEndDescriptions.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textBoxEndDescriptions.Size = new System.Drawing.Size(474, 85);
+            this.textBoxEndDescriptions.TabIndex = 9;
             // 
             // label5
             // 
@@ -125,16 +125,16 @@
             this.label5.TabIndex = 8;
             this.label5.Text = "End of Descriptions:";
             // 
-            // textBox2
+            // textBoxStartDescriptions
             // 
-            this.textBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.textBoxStartDescriptions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox2.Location = new System.Drawing.Point(117, 99);
-            this.textBox2.Multiline = true;
-            this.textBox2.Name = "textBox2";
-            this.textBox2.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox2.Size = new System.Drawing.Size(474, 85);
-            this.textBox2.TabIndex = 7;
+            this.textBoxStartDescriptions.Location = new System.Drawing.Point(117, 99);
+            this.textBoxStartDescriptions.Multiline = true;
+            this.textBoxStartDescriptions.Name = "textBoxStartDescriptions";
+            this.textBoxStartDescriptions.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textBoxStartDescriptions.Size = new System.Drawing.Size(474, 85);
+            this.textBoxStartDescriptions.TabIndex = 7;
             // 
             // label4
             // 
@@ -182,14 +182,14 @@
             this.label2.TabIndex = 2;
             this.label2.Text = "Output root folder:";
             // 
-            // textBox1
+            // textBoxFeedUrl
             // 
-            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.textBoxFeedUrl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(117, 27);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(474, 20);
-            this.textBox1.TabIndex = 1;
+            this.textBoxFeedUrl.Location = new System.Drawing.Point(117, 27);
+            this.textBoxFeedUrl.Name = "textBoxFeedUrl";
+            this.textBoxFeedUrl.Size = new System.Drawing.Size(474, 20);
+            this.textBoxFeedUrl.TabIndex = 1;
             // 
             // label1
             // 
@@ -200,20 +200,40 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Feed URL:";
             // 
-            // groupBox1
+            // groupBoxProgess
             // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.groupBoxProgess.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox1.Controls.Add(this.progressBar);
-            this.groupBox1.Controls.Add(this.richTextBoxLog);
-            this.groupBox1.Controls.Add(this.buttonProcess);
-            this.groupBox1.Location = new System.Drawing.Point(12, 308);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(720, 281);
-            this.groupBox1.TabIndex = 1;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Progress";
+            this.groupBoxProgess.Controls.Add(this.progressBar);
+            this.groupBoxProgess.Controls.Add(this.textBoxLog);
+            this.groupBoxProgess.Controls.Add(this.buttonProcess);
+            this.groupBoxProgess.Location = new System.Drawing.Point(12, 308);
+            this.groupBoxProgess.Name = "groupBoxProgess";
+            this.groupBoxProgess.Size = new System.Drawing.Size(720, 281);
+            this.groupBoxProgess.TabIndex = 1;
+            this.groupBoxProgess.TabStop = false;
+            this.groupBoxProgess.Text = "Progress";
+            // 
+            // progressBar
+            // 
+            this.progressBar.Location = new System.Drawing.Point(117, 26);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(597, 23);
+            this.progressBar.TabIndex = 15;
+            // 
+            // textBoxLog
+            // 
+            this.textBoxLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxLog.BackColor = System.Drawing.SystemColors.Window;
+            this.textBoxLog.Location = new System.Drawing.Point(6, 65);
+            this.textBoxLog.Name = "textBoxLog";
+            this.textBoxLog.ReadOnly = true;
+            this.textBoxLog.Size = new System.Drawing.Size(708, 210);
+            this.textBoxLog.TabIndex = 14;
+            this.textBoxLog.Text = "";
             // 
             // buttonProcess
             // 
@@ -225,39 +245,19 @@
             this.buttonProcess.Text = "Process";
             this.buttonProcess.UseVisualStyleBackColor = true;
             // 
-            // richTextBoxLog
-            // 
-            this.richTextBoxLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.richTextBoxLog.BackColor = System.Drawing.SystemColors.Window;
-            this.richTextBoxLog.Location = new System.Drawing.Point(6, 65);
-            this.richTextBoxLog.Name = "richTextBoxLog";
-            this.richTextBoxLog.ReadOnly = true;
-            this.richTextBoxLog.Size = new System.Drawing.Size(708, 210);
-            this.richTextBoxLog.TabIndex = 14;
-            this.richTextBoxLog.Text = "";
-            // 
-            // progressBar
-            // 
-            this.progressBar.Location = new System.Drawing.Point(119, 32);
-            this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(587, 23);
-            this.progressBar.TabIndex = 15;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(744, 601);
-            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.groupBoxProgess);
             this.Controls.Add(this.groupBoxSettings);
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "MainForm";
             this.groupBoxSettings.ResumeLayout(false);
             this.groupBoxSettings.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
+            this.groupBoxProgess.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -269,18 +269,18 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox textBoxOutputFolder;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox textBoxFeedUrl;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.TextBox textBoxEndDescriptions;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TextBox textBoxStartDescriptions;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button buttonOpenOutputFolder;
         private System.Windows.Forms.Button buttonSelectOutputFolder;
         private System.Windows.Forms.Button buttonSaveSettings;
-        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox groupBoxProgess;
         private System.Windows.Forms.ProgressBar progressBar;
-        private System.Windows.Forms.RichTextBox richTextBoxLog;
+        private System.Windows.Forms.RichTextBox textBoxLog;
         private System.Windows.Forms.Button buttonProcess;
     }
 }

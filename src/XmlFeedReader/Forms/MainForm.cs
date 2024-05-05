@@ -38,6 +38,7 @@ namespace XmlFeedReader.Forms
                 this.OneWayBind(ViewModel, vm => vm.AppTitle, view => view.Text);
                 this.OneWayBind(ViewModel, vm => vm.AppIcon, view => view.Icon);
 
+                this.BindCommand(ViewModel, vm => vm.SelectRootFolderCommand, view => view.buttonSelectOutputFolder);
                 this.BindCommand(ViewModel, vm => vm.OpenRootFolderCommand, view => view.buttonOpenOutputFolder);
 
             });

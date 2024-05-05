@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Input;
 using XmlFeedReader.Properties;
 using XmlFeedReader.Services;
@@ -18,6 +19,7 @@ namespace XmlFeedReader.ViewModels
     public class MainViewModel: ViewModelBase
     {
         private readonly AssemblyService _assembly;
+        private readonly DialogService _dialogService;
         private readonly ILogger _log;
 
         public Action<Action> SafeAction { get; set; }
@@ -25,12 +27,14 @@ namespace XmlFeedReader.ViewModels
         public MainViewModel()
         {
             _assembly = ServiceLocator.Current.Get<AssemblyService>();
-
+            _dialogService = ServiceLocator.Current.Get<DialogService>();
             _log = ServiceLocator.Current.Get<ILogger>();
 
             AppTitle = $"{_assembly.AssemblyProduct} - v{_assembly.AssemblyVersion}";
             AppIcon = Resources.Favicon;
 
+
+            SelectRootFolderCommand = ReactiveCommand.CreateFromTask(SelectRootFolderAsync);
             OpenRootFolderCommand = ReactiveCommand.Create(() => OpenFolder(OutputRootFolder));
         }
 
@@ -101,6 +105,17 @@ namespace XmlFeedReader.ViewModels
 
             Process.Start(path);
         }
+
+        public ICommand SelectRootFolderCommand { get; private set; }
+        private async Task SelectRootFolderAsync()
+        {
+            var selectedPath = await _dialogService.ShowFolderBrowserDialogAsync();
+            if(!string.IsNullOrWhiteSpace(selectedPath))
+            {
+                OutputRootFolder = selectedPath;
+            }
+        }
+        
 
     }
 }

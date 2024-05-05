@@ -58,6 +58,7 @@ namespace XmlFeedReader
                         .AppSettings()
                         .CreateLogger());
             ServiceLocator.Current.Register<AssemblyService>(() => AssemblyService.Current);
+            ServiceLocator.Current.Register<DialogService>();
         }
 
         private static MainForm s_mainForm = null;

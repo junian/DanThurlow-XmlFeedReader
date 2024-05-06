@@ -43,6 +43,38 @@ namespace XmlFeedReader.Services
             return null;
         }
 
+        public Task ShowSuccessAsync(string caption)
+        {
+            ShowSuccess(caption);
+            return Task.CompletedTask;
+        }
+
+        public void ShowSuccess(string text)
+        {
+            MessageBox.Show(
+                owner: Program.MainForm,
+                text: text,
+                caption: _assemblyService.AssemblyProduct,
+                buttons: MessageBoxButtons.OK,
+                icon: MessageBoxIcon.Hand);
+        }
+
+        public Task ShowErrorAsync(string caption)
+        {
+            ShowError(caption);
+            return Task.CompletedTask;
+        }
+
+        public void ShowError(string text)
+        {
+            MessageBox.Show(
+                owner: Program.MainForm,
+                text: text,
+                caption: _assemblyService.AssemblyProduct,
+                buttons: MessageBoxButtons.OK,
+                icon: MessageBoxIcon.Error);
+        }
+
         public Task ShowMessageAsync(string caption)
         {
             ShowMessage(caption);
@@ -54,7 +86,9 @@ namespace XmlFeedReader.Services
             MessageBox.Show(
                 owner: Program.MainForm, 
                 text: text, 
-                caption: _assemblyService.AssemblyProduct);
+                caption: _assemblyService.AssemblyProduct,
+                buttons: MessageBoxButtons.OK,
+                icon: MessageBoxIcon.Information);
         }
         public Task<string> ShowFolderBrowserAsync()
         {

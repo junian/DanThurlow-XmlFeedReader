@@ -7,11 +7,13 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reactive;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
+using System.Xml.Linq;
 using XmlFeedReader.Properties;
 using XmlFeedReader.Services;
 
@@ -37,7 +39,7 @@ namespace XmlFeedReader.ViewModels
 
             SelectRootFolderCommand = ReactiveCommand.CreateFromTask(SelectRootFolderAsync);
             OpenRootFolderCommand = ReactiveCommand.Create(() => OpenFolder(OutputRootFolder));
-
+            TestFeedCommand = ReactiveCommand.CreateFromTask(TestFeedAsync);
             SaveSettingsCommand = ReactiveCommand.CreateFromTask(SaveSettingsAsync);
             IsSavingSettingsCommand = ReactiveCommand.Create(IsSavingSettingsAsync);
         }
@@ -66,6 +68,33 @@ namespace XmlFeedReader.ViewModels
             }
         }
 
+        public ICommand TestFeedCommand { get; private set; }
+        private async Task TestFeedAsync()
+        {
+            var outputPath = Path.GetTempFileName();
+            var url = FeedUrl;
+
+            try
+            {
+
+                using (var client = new WebClient())
+                {
+                    await client.DownloadFileTaskAsync(
+                        new Uri(url),
+                        outputPath);
+                }
+
+                var products = XElement.Load(outputPath);
+
+                await _dialogService.ShowMessageAsync("Download and parse test success.");
+            }
+            catch (Exception ex)
+            {
+                await _dialogService.ShowErrorAsync(ex.ToString());
+            }
+
+            File.Delete(outputPath);
+        }
         public string OutputRootFolder
         {
             get => Settings.Default.OutputFolder;

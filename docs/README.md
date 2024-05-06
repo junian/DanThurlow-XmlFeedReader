@@ -7,14 +7,14 @@ We need an app to run on Windows that reads product data from an XML feed and cr
 
 ```
 Root folder
-----Products (folder)
-    ----Product title 1 (folder)
-        ----Price.txt
-        ----A.jpg 
-        ----B.jpg
-        ----etc.
-    ----etc.
-----LogFile.txt
+├──Products (folder)
+|  ├──Product title 1 (folder)
+|  |  ├──Price.txt
+|  │  ├──A.jpg 
+|  │  ├──B.jpg
+|  │  └──etc.
+|  └──etc.
+└──LogFile.txt
 ```
 
 ## TITLE

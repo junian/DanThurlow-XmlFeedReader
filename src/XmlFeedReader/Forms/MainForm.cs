@@ -51,6 +51,18 @@ namespace XmlFeedReader.Forms
 
                 this.BindCommand(ViewModel, vm => vm.SaveSettingsCommand, view => view.buttonSaveSettings);
 
+                this.FormClosing += async (_, e) =>
+                {
+                    var result = await ViewModel.IsSavingSettingsAsync();
+                    if (result == true)
+                    {
+                        Settings.Default.Save();
+                    }
+                    else if(result == null)
+                    {
+                        e.Cancel = true;
+                    }
+                };
 
             });
 

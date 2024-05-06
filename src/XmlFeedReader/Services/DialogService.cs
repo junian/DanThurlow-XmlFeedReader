@@ -17,25 +17,51 @@ namespace XmlFeedReader.Services
             _assemblyService = ServiceLocator.Current.Get<AssemblyService>();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns>True if Yes, False if No, Null if Cancel</returns>
+        public Task<bool?> ShowYesNoAsync(string text)
+        {
+            return Task.FromResult(ShowYesNo(text));
+        }
+
+        public bool? ShowYesNo(string text)
+        {
+            var result = MessageBox.Show(
+                owner: Program.MainForm,
+                text: text,
+                caption: _assemblyService.AssemblyProduct,
+                buttons: MessageBoxButtons.YesNoCancel);
+
+            if( result == DialogResult.Yes)
+                return true;
+            else if( result == DialogResult.No)
+                return false;
+
+            return null;
+        }
+
         public Task ShowMessageAsync(string caption)
         {
-            ShowMessageBox(caption);
+            ShowMessage(caption);
             return Task.CompletedTask;
         }
 
-        public void ShowMessageBox(string text)
+        public void ShowMessage(string text)
         {
             MessageBox.Show(
                 owner: Program.MainForm, 
                 text: text, 
                 caption: _assemblyService.AssemblyProduct);
         }
-        public Task<string> ShowFolderBrowserDialogAsync()
+        public Task<string> ShowFolderBrowserAsync()
         {
-            return Task.FromResult(ShowFolderBrowserDialog());
+            return Task.FromResult(ShowFolderBrowser());
         }
 
-        public string ShowFolderBrowserDialog()
+        public string ShowFolderBrowser()
         {
             using (var fbd = new FolderBrowserDialog())
             {

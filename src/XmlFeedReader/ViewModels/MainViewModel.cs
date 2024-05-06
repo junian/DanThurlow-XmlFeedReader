@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reactive;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -38,6 +39,7 @@ namespace XmlFeedReader.ViewModels
             OpenRootFolderCommand = ReactiveCommand.Create(() => OpenFolder(OutputRootFolder));
 
             SaveSettingsCommand = ReactiveCommand.CreateFromTask(SaveSettingsAsync);
+            IsSavingSettingsCommand = ReactiveCommand.Create(IsSavingSettingsAsync);
         }
 
         private string _appTitle;
@@ -133,13 +135,18 @@ namespace XmlFeedReader.ViewModels
         public ICommand SelectRootFolderCommand { get; private set; }
         private async Task SelectRootFolderAsync()
         {
-            var selectedPath = await _dialogService.ShowFolderBrowserDialogAsync();
+            var selectedPath = await _dialogService.ShowFolderBrowserAsync();
             if(!string.IsNullOrWhiteSpace(selectedPath))
             {
                 OutputRootFolder = selectedPath;
             }
         }
-        
+
+        public ReactiveCommand<Unit, Task<bool?>> IsSavingSettingsCommand { get; private set; }
+        public Task<bool?> IsSavingSettingsAsync()
+        {
+            return _dialogService.ShowYesNoAsync("Do you want to Save your Settings?");
+        }
 
     }
 }

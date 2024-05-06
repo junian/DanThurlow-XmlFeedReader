@@ -44,9 +44,9 @@
             this.label1 = new System.Windows.Forms.Label();
             this.groupBoxProgess = new System.Windows.Forms.GroupBox();
             this.progressBarGetProducts = new System.Windows.Forms.ProgressBar();
-            this.buttonGetProducts = new System.Windows.Forms.Button();
             this.textBoxLog = new System.Windows.Forms.RichTextBox();
             this.buttonFeedTest = new System.Windows.Forms.Button();
+            this.buttonGetProducts = new System.Windows.Forms.Button();
             this.groupBoxSettings.SuspendLayout();
             this.groupBoxProgess.SuspendLayout();
             this.SuspendLayout();
@@ -207,8 +207,8 @@
             this.groupBoxProgess.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBoxProgess.Controls.Add(this.progressBarGetProducts);
             this.groupBoxProgess.Controls.Add(this.buttonGetProducts);
+            this.groupBoxProgess.Controls.Add(this.progressBarGetProducts);
             this.groupBoxProgess.Controls.Add(this.textBoxLog);
             this.groupBoxProgess.Location = new System.Drawing.Point(12, 308);
             this.groupBoxProgess.Name = "groupBoxProgess";
@@ -225,16 +225,6 @@
             this.progressBarGetProducts.Name = "progressBarGetProducts";
             this.progressBarGetProducts.Size = new System.Drawing.Size(528, 23);
             this.progressBarGetProducts.TabIndex = 17;
-            // 
-            // buttonGetProducts
-            // 
-            this.buttonGetProducts.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonGetProducts.Location = new System.Drawing.Point(9, 19);
-            this.buttonGetProducts.Name = "buttonGetProducts";
-            this.buttonGetProducts.Size = new System.Drawing.Size(171, 40);
-            this.buttonGetProducts.TabIndex = 15;
-            this.buttonGetProducts.Text = "Get Products ";
-            this.buttonGetProducts.UseVisualStyleBackColor = true;
             // 
             // textBoxLog
             // 
@@ -258,6 +248,16 @@
             this.buttonFeedTest.TabIndex = 13;
             this.buttonFeedTest.Text = "Test";
             this.buttonFeedTest.UseVisualStyleBackColor = true;
+            // 
+            // buttonGetProducts
+            // 
+            this.buttonGetProducts.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonGetProducts.Location = new System.Drawing.Point(6, 18);
+            this.buttonGetProducts.Name = "buttonGetProducts";
+            this.buttonGetProducts.Size = new System.Drawing.Size(145, 41);
+            this.buttonGetProducts.TabIndex = 18;
+            this.buttonGetProducts.Text = "Get Products";
+            this.buttonGetProducts.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
@@ -295,7 +295,7 @@
         private System.Windows.Forms.GroupBox groupBoxProgess;
         private System.Windows.Forms.RichTextBox textBoxLog;
         private System.Windows.Forms.ProgressBar progressBarGetProducts;
-        private System.Windows.Forms.Button buttonGetProducts;
         private System.Windows.Forms.Button buttonFeedTest;
+        private System.Windows.Forms.Button buttonGetProducts;
     }
 }

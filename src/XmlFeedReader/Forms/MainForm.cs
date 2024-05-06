@@ -38,6 +38,8 @@ namespace XmlFeedReader.Forms
                 this.OneWayBind(ViewModel, vm => vm.AppTitle, view => view.Text);
                 this.OneWayBind(ViewModel, vm => vm.AppIcon, view => view.Icon);
 
+                this.OneWayBind(ViewModel, vm => vm.IsNotProcessing, view => view.groupBoxSettings.Enabled);
+
                 this.Bind(ViewModel, vm => vm.FeedUrl, view => view.textBoxFeedUrl.Text);
                 this.BindCommand(ViewModel, vm => vm.TestFeedCommand, view => view.buttonFeedTest);
 
@@ -52,6 +54,10 @@ namespace XmlFeedReader.Forms
                 this.Bind(ViewModel, vm => vm.DescriptionEnd, view => view.textBoxEndDescriptions.Text);
 
                 this.BindCommand(ViewModel, vm => vm.SaveSettingsCommand, view => view.buttonSaveSettings);
+
+                this.Bind(ViewModel, vm => vm.GetProductsButtonText, view => view.buttonGetProducts.Text);
+                this.BindCommand(ViewModel, vm => vm.GetProductsCommand, view => view.buttonGetProducts);
+
 
                 this.FormClosing += async (_, e) =>
                 {

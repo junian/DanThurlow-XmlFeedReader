@@ -33,7 +33,8 @@ namespace XmlFeedReader.Services
                 owner: Program.MainForm,
                 text: text,
                 caption: _assemblyService.AssemblyProduct,
-                buttons: MessageBoxButtons.YesNoCancel);
+                buttons: MessageBoxButtons.YesNoCancel,
+                icon: MessageBoxIcon.Question);
 
             if( result == DialogResult.Yes)
                 return true;
@@ -88,8 +89,9 @@ namespace XmlFeedReader.Services
                 text: text, 
                 caption: _assemblyService.AssemblyProduct,
                 buttons: MessageBoxButtons.OK,
-                icon: MessageBoxIcon.Information);
+                icon: MessageBoxIcon.None);
         }
+
         public Task<string> ShowFolderBrowserAsync()
         {
             return Task.FromResult(ShowFolderBrowser());

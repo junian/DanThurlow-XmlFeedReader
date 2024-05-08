@@ -18,12 +18,16 @@
     <Company>Juniansoft</Company>
     <Product>XML Feed Reader</Product>
 
+	<DebugSymbols>true</DebugSymbols>
+	<DebugType>full</DebugType>
+	  
     <!-- Versions -->
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
     <Version>$(AssemblyVersion)</Version>
     <PackageVersion>$(AssemblyVersion)</PackageVersion>
     <ApplicationIcon>Resources\Favicon.ico</ApplicationIcon>
+	
   </PropertyGroup>
 
   <ItemGroup>

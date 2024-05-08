@@ -2,6 +2,7 @@
 using ReactiveUI;
 using Serilog;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -10,10 +11,8 @@ using System.Linq;
 using System.Net;
 using System.Reactive;
 using System.Security.Policy;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Windows.Input;
 using System.Xml.Linq;
 using XmlFeedReader.Models;
@@ -149,7 +148,7 @@ namespace XmlFeedReader.ViewModels
         public ICommand OpenRootFolderCommand { get; private set; }
         private void OpenFolder(string path)
         {
-            _log.Information($"Opening `{path}`");
+            //_log.Information($"Opening `{path}`");
             if (!Directory.Exists(path))
             {
                 try
@@ -198,35 +197,258 @@ namespace XmlFeedReader.ViewModels
         CancellationTokenSource source = new CancellationTokenSource();
 
         private string _getProductsButtonText = "Get Products";
+        private ConcurrentBag<string> _productsAdded;
+        private ConcurrentBag<string> _productsUpdated;
+        private ConcurrentBag<string> _productsDeleted;
+        private ConcurrentBag<string> _productsError;
+
         public string GetProductsButtonText
         {
             get => _getProductsButtonText;
             set => this.RaiseAndSetIfChanged(ref _getProductsButtonText, value);
         }
 
+        public Action<string> RecordErrorAction { get; set; }
         public ICommand GetProductsCommand { get; private set; }
         private async Task GetProductsAsync()
         {
             if(IsProcessing)
             {
                 var result = await _dialogService.ShowYesNoAsync("Are you sure you want to cancel?");
-                if(result == true)
+                if (result == true)
+                {
                     source.Cancel();
+
+                    ProgressText = "Canceling ...";
+                }
                 return;
             }
 
             IsProcessing = true;
             GetProductsButtonText = "Cancel";
 
+            //_log.Information($"Creating directory: {OutputRootFolder}");
+            Directory.CreateDirectory(OutputRootFolder);
+            var log = Path.Combine(OutputRootFolder, "LogFile.txt");
+
+            ProgressText = "Starting ...";
+            MaxProgress = 1;
+            CurrentProgress = 0;
+
+            WriteLog(log, "Starting ...");
+
+            _productsAdded = new ConcurrentBag<string>();
+            _productsUpdated = new ConcurrentBag<string>();
+            _productsDeleted = new ConcurrentBag<string>();
+            _productsError = new ConcurrentBag<string>();
+
+            RecordErrorAction = (x) =>
+            {
+                WriteLog(log, x);
+                _productsError.Add(x);
+            };
+
             source = new CancellationTokenSource();
             var token = source.Token;
 
+            
             var productList = await GetProductListAsync(token);
+            var uniqueDirs = Directory.GetDirectories(OutputRootFolder);
 
-            await Task.Delay(10000, token);
+            var uniqueProducts = productList
+                .Where(x => !string.IsNullOrWhiteSpace(x.Title))
+                .Select(x => x.Title)
+                .Distinct()
+                .ToDictionary(x => x);
+            
+            foreach(var dir in uniqueDirs)
+            {
+                var dirName = new DirectoryInfo(dir).Name;
+                if (!uniqueProducts.ContainsKey(dirName))
+                {
+                    _productsDeleted.Add(dir);
+                    Directory.Delete(dir, true);
+                }
+            }
+
+            MaxProgress = productList.Count;
+            CurrentProgress = 0;
+            
+            foreach(var p in productList)
+            {
+                CurrentProgress++;
+
+                ProgressText = $"({CurrentProgress.ToString("D3")}/{(MaxProgress).ToString("D3")}) Processing '{p.Id} - {p.Title}' ...";
+
+                var errorDir = await ProcessProductAsync(p, token);
+
+                if(!string.IsNullOrWhiteSpace(errorDir) && Directory.Exists(errorDir))
+                    Directory.Delete(errorDir, true);
+
+                if (token.IsCancellationRequested)
+                    break;
+            }
+
+            if(!token.IsCancellationRequested)
+            { 
+                CurrentProgress = MaxProgress;
+                ProgressText = $"({(MaxProgress).ToString("D3")}/{(MaxProgress).ToString("D3")}) Finished.";
+                WriteLog(log, $"finished with {_productsAdded.Count} products added, {_productsUpdated.Count} updated, {_productsDeleted.Count} deleted, {_productsError.Count} errors.");
+            }
+            else
+            {
+                ProgressText = $"({CurrentProgress.ToString("D3")}/{(MaxProgress).ToString("D3")}) Canceled by user.";
+                WriteLog(log, "Canceled by user.");
+            }
 
             GetProductsButtonText = "Get Products";
             IsProcessing = false;
+        }
+
+        /// <summary>
+        /// Process the product.
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns>If process has issue, it'll return errorDir.</returns>
+        private async Task<string> ProcessProductAsync(Product p, CancellationToken token)
+        {
+            var isModified = false;
+
+            if (string.IsNullOrWhiteSpace(p.Title))
+            {
+                RecordErrorAction($"Copy failed for \"{p.Id}\" no title was found.");
+                return string.Empty;
+            }
+
+            var productDir = Path.Combine(OutputRootFolder, SafeFilename(p.Title));
+            var lastmodFile = Path.Combine(OutputRootFolder, ".lastmod");
+
+            var priceFloat = default(float);
+
+            if (p.Price == null || !float.TryParse(p.Price, out priceFloat))
+            {
+                RecordErrorAction($"Copy failed for \"{p.Id} - {p.Title}\" no price was found.");
+                return productDir;
+            }
+
+            if (string.IsNullOrWhiteSpace(p.Description))
+            {
+                RecordErrorAction($"Copy failed for \"{p.Id} - {p.Title}\" no description was found.");
+                return productDir;
+            }
+
+            if (string.IsNullOrWhiteSpace(p.ImageLink))
+            {
+                RecordErrorAction($"Copy failed for \"{p.Id} - {p.Title}\" no main image was found.");
+                return productDir;
+            }
+
+            if (Directory.Exists(productDir))
+            {
+                isModified = true;
+                var lastmodText = "";
+                if(File.Exists(lastmodFile))
+                    lastmodText = File.ReadAllText(lastmodFile);
+
+                if (string.IsNullOrWhiteSpace(p.LastModified))
+                {
+                    Directory.Delete(productDir, true);
+                }
+                else if(!string.IsNullOrWhiteSpace(lastmodText) && string.Compare(p.LastModified, lastmodText, StringComparison.OrdinalIgnoreCase) > 0)
+                {
+                    Directory.Delete(productDir, true);
+                }
+                else
+                {
+                    RecordErrorAction($"Copy failed for \"{p.Id} - {p.Title}\" a product with same title already exists.");
+                    return productDir;
+                }
+            }
+
+            Directory.CreateDirectory(productDir);
+
+            if (!string.IsNullOrWhiteSpace(p.LastModified))
+            {
+                File.WriteAllText(lastmodFile, p.LastModified);
+            }
+
+            int price = IsPriceRounding ? (int)Math.Round(priceFloat) : (int)Math.Floor(priceFloat);
+            var productFile = Path.Combine(productDir, $"{price}.txt");
+
+            var prodict = p.ToDictionary();
+            var description = string.Join("", DescriptionStart, p.Description, DescriptionEnd);
+
+            foreach(var kv in prodict)
+            {
+                description = description.Replace(kv.Key, kv.Value);
+            }
+
+            File.WriteAllText(productFile, description);
+
+            var imageDownloadList = new Dictionary<char, string>();
+            var key = 'A';
+
+            imageDownloadList.Add(key++, p.ImageLink);
+            foreach (var l in p.AdditionalImageLinks)
+            {
+                imageDownloadList.Add(key++, l);
+            }
+
+            var imageDownloadError = new ConcurrentBag<string>();
+
+            //Parallel.ForEach(imageDownloadList, async (img) =>
+            //foreach(var img in imageDownloadList)
+            await Task.WhenAll(imageDownloadList.Select(async img =>
+            {
+                //_log.Information(img.Value);
+                var targetFilename =
+                        Path.Combine(
+                            productDir,
+                            $"{img.Key}{Path.GetExtension(GetFileNameFromUrl(img.Value))}");
+                //_log.Information(targetFilename);
+
+                var tmp = Path.GetTempFileName();
+
+                try
+                {
+                    using (var client = new WebClient())
+                    {
+                        await client.DownloadFileTaskAsync(
+                            new Uri(img.Value),
+                            tmp);
+                    }
+
+                    //_log.Information($"Moving '{tmp}' to '{targetFilename}'");
+                    if (File.Exists(targetFilename))
+                        File.Delete(targetFilename);
+
+                    File.Move(tmp, targetFilename);
+                }
+                catch (Exception ex)
+                {
+                    imageDownloadError.Add(img.Value);
+                    _log.Error(ex.ToString());
+                }
+            }));
+
+            if(imageDownloadError.Count > 0)
+            {
+                foreach (var imgError in imageDownloadError)
+                {
+                    RecordErrorAction($"Copy failed for \"{p.Id} - {p.Title}\" unable to download {imgError}.");
+                    break;
+                }
+                return productDir;
+            }
+
+            await Task.CompletedTask;
+
+            if (isModified)
+                _productsUpdated.Add($"{p.Id} - {p.Title}");
+            else
+                _productsAdded.Add($"{p.Id} - {p.Title}");
+
+            return string.Empty;
         }
 
         private async Task<List<Product>> GetProductListAsync(CancellationToken token)
@@ -246,62 +468,78 @@ namespace XmlFeedReader.ViewModels
 
                 var productsXml = XElement.Load(outputPath);
                 var productNodeList = productsXml.Descendants("product");
+
                 foreach (var p in productNodeList)
                 {
                     var productObject = new Product()
                     {
-                        Id = (int) p.Element("id"),
-                        Title = WebUtility.HtmlDecode((string)p.Element("title")),
-                        Description = WebUtility.HtmlDecode((string)p.Element("description")),
-                        Link = WebUtility.HtmlDecode((string)p.Element("link")),
-                        ImageLink = WebUtility.HtmlDecode((string)p.Element("image")),
-                        Price = (float)p.Element("price"),
-                        Availability = WebUtility.HtmlDecode((string)p.Element("availability")),
-                        AddToCartLink = WebUtility.HtmlDecode((string)p.Element("add_to_cart_link")),
-                        StockLevel = (int)p.Element("stock_level"),
-                        Hidden = WebUtility.HtmlDecode((string)p.Element("hidden")),
-                        Visibility = WebUtility.HtmlDecode((string)p.Element("visibility")),
-                        Virtual = WebUtility.HtmlDecode((string)p.Element("virtual")),
+                        Id = HtmlDecode((string)p?.Element("id")),
+                        Title = HtmlDecode((string)p?.Element("title")),
+                        Description = HtmlDecode((string)p?.Element("description")),
+                        Link = HtmlDecode((string)p?.Element("link")),
+                        ImageLink = HtmlDecode((string)p?.Element("image_link")),
+                        Price = HtmlDecode((string)p?.Element("price")),
+                        Availability = HtmlDecode((string)p?.Element("availability")),
+                        AddToCartLink = HtmlDecode((string)p?.Element("add_to_cart_link")),
+                        StockLevel = HtmlDecode((string)p?.Element("stock_level")),
+                        Hidden = HtmlDecode((string)p?.Element("hidden")),
+                        Visibility = HtmlDecode((string)p?.Element("visibility")),
+                        Virtual = HtmlDecode((string)p?.Element("virtual")),
+                        LastModified = HtmlDecode((string)p?.Element("last_modified")),
                     };
 
+                    
                     var categories = p.Element("categories")
-                        .Descendants("category");
+                        ?.Descendants("category");
 
-                    foreach (var category in categories)
+                    if (categories != null)
                     {
-                        var cat = WebUtility.HtmlDecode((string)category).Trim();
-                        if (!string.IsNullOrWhiteSpace(cat))
-                            productObject.Categories.Add(cat);
+                        foreach (var category in categories)
+                        {
+                            var cat = HtmlDecode((string)category).Trim();
+                            if (!string.IsNullOrWhiteSpace(cat))
+                                productObject.Categories.Add(cat);
+                        }
                     }
 
                     var categoriesLink = p.Element("category_links")
-                        .Descendants("category_link");
+                        ?.Descendants("category_link");
 
-                    foreach (var category in categoriesLink)
+                    if (categoriesLink != null)
                     {
-                        var cat = WebUtility.HtmlDecode((string)category).Trim();
-                        if (!string.IsNullOrWhiteSpace(cat))
-                            productObject.CategoryLinks.Add(cat);
+                        foreach (var category in categoriesLink)
+                        {
+                            var cat = HtmlDecode((string)category).Trim();
+                            if (!string.IsNullOrWhiteSpace(cat))
+                                productObject.CategoryLinks.Add(cat);
+                        }
                     }
 
                     var additionalImages = p.Elements()
-                        .Where(x => x.Name.ToString().StartsWith("additional_image_link"));
+                        ?.Where(x => x.Name.ToString().StartsWith("additional_image_link"));
 
-                    foreach (var item in additionalImages)
+                    if (additionalImages != null)
                     {
-                        productObject.AdditionalImageLinks.Add(WebUtility.HtmlDecode(item.ToString().Trim()));
+                        foreach (var item in additionalImages)
+                        {
+                            var link = HtmlDecode((string)item).Trim();
+                            if (!string.IsNullOrWhiteSpace(link))
+                                productObject.AdditionalImageLinks.Add(link);
+                        }
                     }
-
-                    _log.Information(productObject.AdditionalImageLinks.Count + "");
 
                     result.Add(productObject);
                 }
             }
-            catch (TaskCanceledException ex) { }
+            catch (TaskCanceledException ex) 
+            {
+                _log.Warning(ex.ToString());
+            }
             catch (Exception ex)
             {
+                _log.Error(ex.ToString());
                 await _dialogService.ShowErrorAsync(ex.ToString());
-                return new List<Product>();
+                result = new List<Product>();
             }
 
             try
@@ -311,6 +549,60 @@ namespace XmlFeedReader.ViewModels
             catch { }
 
             return result;
+        }
+
+        private string SafeFilename(string filename)
+        {
+            return string.Join("_", filename.Split(Path.GetInvalidFileNameChars()));
+        }
+
+        private string GetFileNameFromUrl(string url)
+        {
+            //_log.Information(url);
+            Uri uri;
+            if (!Uri.TryCreate(url, UriKind.Absolute, out uri))
+                uri = new Uri(new Uri("https://www.juniansoft.com/"), url);
+
+            return (Path.GetFileName(uri.LocalPath));
+        }
+
+        private int _currentProgress = 0;
+        public int CurrentProgress
+        {
+            get => _currentProgress;
+            set => this.RaiseAndSetIfChanged(ref _currentProgress, value);
+        }
+
+        private int _maxProgress = 1;
+        public int MaxProgress
+        {
+            get => _maxProgress;
+            set => this.RaiseAndSetIfChanged(ref _maxProgress, value);
+        }
+
+        private void WriteLog(string path, string message)
+        {
+            var logMessage
+                = $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")} - {message}{Environment.NewLine}";
+            File.AppendAllText(path, logMessage);
+            AppendLogAction(logMessage);
+        }
+
+        public Action<string> AppendLogAction { get; set; }
+
+        private string _progressText = "...";
+        public string ProgressText
+        {
+            get => _progressText;
+            set => this.RaiseAndSetIfChanged(ref _progressText, value);
+        }
+
+        private string HtmlDecode(string html) 
+        {
+            if (string.IsNullOrEmpty(html))
+                return string.Empty;
+
+            return WebUtility.HtmlDecode(html);
         }
 
     }

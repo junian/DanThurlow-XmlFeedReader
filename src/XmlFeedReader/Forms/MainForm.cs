@@ -58,6 +58,9 @@ namespace XmlFeedReader.Forms
                 this.Bind(ViewModel, vm => vm.GetProductsButtonText, view => view.buttonGetProducts.Text);
                 this.BindCommand(ViewModel, vm => vm.GetProductsCommand, view => view.buttonGetProducts);
 
+                this.Bind(ViewModel, vm => vm.ProgressText, view => view.labelProgress.Text);
+                this.Bind(ViewModel, vm => vm.MaxProgress, view => view.progressBarGetProducts.Maximum);
+                this.Bind(ViewModel, vm => vm.CurrentProgress, view => view.progressBarGetProducts.Value);
 
                 this.FormClosing += async (_, e) =>
                 {
@@ -72,6 +75,10 @@ namespace XmlFeedReader.Forms
                     }
                 };
 
+                ViewModel.AppendLogAction = x =>
+                {
+                    ViewModel.SafeAction(() => textBoxLog.AppendText(x));
+                };
             });
 
             ViewModel = new MainViewModel();
@@ -82,5 +89,7 @@ namespace XmlFeedReader.Forms
             get => ViewModel;
             set => ViewModel = (MainViewModel)ViewModel;
         }
+
+
     }
 }

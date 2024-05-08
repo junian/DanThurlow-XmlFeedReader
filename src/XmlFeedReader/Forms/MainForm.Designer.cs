@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.groupBoxSettings = new System.Windows.Forms.GroupBox();
+            this.buttonFeedTest = new System.Windows.Forms.Button();
             this.buttonSaveSettings = new System.Windows.Forms.Button();
             this.buttonOpenOutputFolder = new System.Windows.Forms.Button();
             this.buttonSelectOutputFolder = new System.Windows.Forms.Button();
@@ -43,10 +44,10 @@
             this.textBoxFeedUrl = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBoxProgess = new System.Windows.Forms.GroupBox();
+            this.buttonGetProducts = new System.Windows.Forms.Button();
             this.progressBarGetProducts = new System.Windows.Forms.ProgressBar();
             this.textBoxLog = new System.Windows.Forms.RichTextBox();
-            this.buttonFeedTest = new System.Windows.Forms.Button();
-            this.buttonGetProducts = new System.Windows.Forms.Button();
+            this.labelProgress = new System.Windows.Forms.Label();
             this.groupBoxSettings.SuspendLayout();
             this.groupBoxProgess.SuspendLayout();
             this.SuspendLayout();
@@ -75,6 +76,16 @@
             this.groupBoxSettings.TabIndex = 0;
             this.groupBoxSettings.TabStop = false;
             this.groupBoxSettings.Text = "Settings";
+            // 
+            // buttonFeedTest
+            // 
+            this.buttonFeedTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonFeedTest.Location = new System.Drawing.Point(597, 25);
+            this.buttonFeedTest.Name = "buttonFeedTest";
+            this.buttonFeedTest.Size = new System.Drawing.Size(75, 23);
+            this.buttonFeedTest.TabIndex = 13;
+            this.buttonFeedTest.Text = "Test";
+            this.buttonFeedTest.UseVisualStyleBackColor = true;
             // 
             // buttonSaveSettings
             // 
@@ -207,6 +218,7 @@
             this.groupBoxProgess.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBoxProgess.Controls.Add(this.labelProgress);
             this.groupBoxProgess.Controls.Add(this.buttonGetProducts);
             this.groupBoxProgess.Controls.Add(this.progressBarGetProducts);
             this.groupBoxProgess.Controls.Add(this.textBoxLog);
@@ -217,13 +229,24 @@
             this.groupBoxProgess.TabStop = false;
             this.groupBoxProgess.Text = "Progress";
             // 
+            // buttonGetProducts
+            // 
+            this.buttonGetProducts.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonGetProducts.Location = new System.Drawing.Point(6, 18);
+            this.buttonGetProducts.Name = "buttonGetProducts";
+            this.buttonGetProducts.Size = new System.Drawing.Size(145, 41);
+            this.buttonGetProducts.TabIndex = 18;
+            this.buttonGetProducts.Text = "Get Products";
+            this.buttonGetProducts.UseVisualStyleBackColor = true;
+            // 
             // progressBarGetProducts
             // 
             this.progressBarGetProducts.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBarGetProducts.Location = new System.Drawing.Point(186, 27);
+            this.progressBarGetProducts.Location = new System.Drawing.Point(157, 36);
+            this.progressBarGetProducts.Maximum = 10000;
             this.progressBarGetProducts.Name = "progressBarGetProducts";
-            this.progressBarGetProducts.Size = new System.Drawing.Size(528, 23);
+            this.progressBarGetProducts.Size = new System.Drawing.Size(557, 23);
             this.progressBarGetProducts.TabIndex = 17;
             // 
             // textBoxLog
@@ -239,25 +262,14 @@
             this.textBoxLog.TabIndex = 14;
             this.textBoxLog.Text = "";
             // 
-            // buttonFeedTest
+            // labelProgress
             // 
-            this.buttonFeedTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonFeedTest.Location = new System.Drawing.Point(597, 25);
-            this.buttonFeedTest.Name = "buttonFeedTest";
-            this.buttonFeedTest.Size = new System.Drawing.Size(75, 23);
-            this.buttonFeedTest.TabIndex = 13;
-            this.buttonFeedTest.Text = "Test";
-            this.buttonFeedTest.UseVisualStyleBackColor = true;
-            // 
-            // buttonGetProducts
-            // 
-            this.buttonGetProducts.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonGetProducts.Location = new System.Drawing.Point(6, 18);
-            this.buttonGetProducts.Name = "buttonGetProducts";
-            this.buttonGetProducts.Size = new System.Drawing.Size(145, 41);
-            this.buttonGetProducts.TabIndex = 18;
-            this.buttonGetProducts.Text = "Get Products";
-            this.buttonGetProducts.UseVisualStyleBackColor = true;
+            this.labelProgress.AutoSize = true;
+            this.labelProgress.Location = new System.Drawing.Point(157, 20);
+            this.labelProgress.Name = "labelProgress";
+            this.labelProgress.Size = new System.Drawing.Size(16, 13);
+            this.labelProgress.TabIndex = 19;
+            this.labelProgress.Text = "...";
             // 
             // MainForm
             // 
@@ -272,6 +284,7 @@
             this.groupBoxSettings.ResumeLayout(false);
             this.groupBoxSettings.PerformLayout();
             this.groupBoxProgess.ResumeLayout(false);
+            this.groupBoxProgess.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -297,5 +310,6 @@
         private System.Windows.Forms.ProgressBar progressBarGetProducts;
         private System.Windows.Forms.Button buttonFeedTest;
         private System.Windows.Forms.Button buttonGetProducts;
+        private System.Windows.Forms.Label labelProgress;
     }
 }

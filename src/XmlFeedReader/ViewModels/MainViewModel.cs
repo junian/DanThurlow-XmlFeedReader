@@ -197,6 +197,7 @@ namespace XmlFeedReader.ViewModels
         CancellationTokenSource source = new CancellationTokenSource();
 
         private string _getProductsButtonText = "Get Products";
+        private HashSet<string> _processedProduct;
         private ConcurrentBag<string> _productsAdded;
         private ConcurrentBag<string> _productsUpdated;
         private ConcurrentBag<string> _productsDeleted;
@@ -228,7 +229,8 @@ namespace XmlFeedReader.ViewModels
             GetProductsButtonText = "Cancel";
 
             //_log.Information($"Creating directory: {OutputRootFolder}");
-            Directory.CreateDirectory(OutputRootFolder);
+            var allProducts = Path.Combine(OutputRootFolder, ProductsDir);
+            Directory.CreateDirectory(allProducts);
             var log = Path.Combine(OutputRootFolder, "LogFile.txt");
 
             ProgressText = "Starting ...";
@@ -237,6 +239,7 @@ namespace XmlFeedReader.ViewModels
 
             WriteLog(log, "Starting ...");
 
+            _processedProduct = new HashSet<string>();
             _productsAdded = new ConcurrentBag<string>();
             _productsUpdated = new ConcurrentBag<string>();
             _productsDeleted = new ConcurrentBag<string>();
@@ -251,21 +254,22 @@ namespace XmlFeedReader.ViewModels
             source = new CancellationTokenSource();
             var token = source.Token;
 
-            
             var productList = await GetProductListAsync(token);
-            var uniqueDirs = Directory.GetDirectories(OutputRootFolder);
+            var uniqueDirs = Directory.GetDirectories(allProducts);
 
             var uniqueProducts = productList
                 .Where(x => !string.IsNullOrWhiteSpace(x.Title))
-                .Select(x => x.Title)
+                .Select(x => SafeFilename(x.Title))
                 .Distinct()
                 .ToDictionary(x => x);
             
             foreach(var dir in uniqueDirs)
             {
                 var dirName = new DirectoryInfo(dir).Name;
+                
                 if (!uniqueProducts.ContainsKey(dirName))
                 {
+                    _log.Information($"Deleted {dirName}");
                     _productsDeleted.Add(dir);
                     Directory.Delete(dir, true);
                 }
@@ -305,6 +309,8 @@ namespace XmlFeedReader.ViewModels
             IsProcessing = false;
         }
 
+        const string ProductsDir = "Products";
+
         /// <summary>
         /// Process the product.
         /// </summary>
@@ -312,6 +318,16 @@ namespace XmlFeedReader.ViewModels
         /// <returns>If process has issue, it'll return errorDir.</returns>
         private async Task<string> ProcessProductAsync(Product p, CancellationToken token)
         {
+            var safeProductTitle = SafeFilename(p.Title);
+
+            if (_processedProduct.Contains(safeProductTitle))
+            {
+                RecordErrorAction($"Copy failed for \"{p.Id} - {p.Title}\" a product with same title already exists.");
+                return string.Empty;
+            }
+
+            _processedProduct.Add(safeProductTitle);
+
             var isModified = false;
 
             if (string.IsNullOrWhiteSpace(p.Title))
@@ -320,8 +336,8 @@ namespace XmlFeedReader.ViewModels
                 return string.Empty;
             }
 
-            var productDir = Path.Combine(OutputRootFolder, SafeFilename(p.Title));
-            var lastmodFile = Path.Combine(OutputRootFolder, ".lastmod");
+            var productDir = Path.Combine(OutputRootFolder, ProductsDir, safeProductTitle);
+            var lastmodFile = Path.Combine(OutputRootFolder, ProductsDir, ".lastmod");
 
             var priceFloat = default(float);
 
@@ -346,6 +362,7 @@ namespace XmlFeedReader.ViewModels
             if (Directory.Exists(productDir))
             {
                 isModified = true;
+                
                 var lastmodText = "";
                 if(File.Exists(lastmodFile))
                     lastmodText = File.ReadAllText(lastmodFile);
@@ -360,8 +377,8 @@ namespace XmlFeedReader.ViewModels
                 }
                 else
                 {
-                    RecordErrorAction($"Copy failed for \"{p.Id} - {p.Title}\" a product with same title already exists.");
-                    return productDir;
+                    _log.Information($"Skipping {p.Id} - {p.Title} ...");
+                    return string.Empty;
                 }
             }
 
@@ -553,7 +570,7 @@ namespace XmlFeedReader.ViewModels
 
         private string SafeFilename(string filename)
         {
-            return string.Join("_", filename.Split(Path.GetInvalidFileNameChars()));
+            return string.Join("", filename.Split(Path.GetInvalidFileNameChars()));
         }
 
         private string GetFileNameFromUrl(string url)

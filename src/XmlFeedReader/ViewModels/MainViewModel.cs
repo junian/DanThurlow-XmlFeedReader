@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -229,80 +230,88 @@ namespace XmlFeedReader.ViewModels
             GetProductsButtonText = "Cancel";
 
             //_log.Information($"Creating directory: {OutputRootFolder}");
-            var allProducts = Path.Combine(OutputRootFolder, ProductsDir);
-            Directory.CreateDirectory(allProducts);
-            var log = Path.Combine(OutputRootFolder, "LogFile.txt");
-
-            ProgressText = "Starting ...";
-            MaxProgress = 1;
-            CurrentProgress = 0;
-
-            WriteLog(log, "Starting ...");
-
-            _processedProduct = new HashSet<string>();
-            _productsAdded = new ConcurrentBag<string>();
-            _productsUpdated = new ConcurrentBag<string>();
-            _productsDeleted = new ConcurrentBag<string>();
-            _productsError = new ConcurrentBag<string>();
-
-            RecordErrorAction = (x) =>
+            try
             {
-                WriteLog(log, x);
-                _productsError.Add(x);
-            };
+                var allProducts = Path.Combine(OutputRootFolder, ProductsDir);
+                Directory.CreateDirectory(allProducts);
+                var log = Path.Combine(OutputRootFolder, "LogFile.txt");
 
-            source = new CancellationTokenSource();
-            var token = source.Token;
+                ProgressText = "Starting ...";
+                MaxProgress = 1;
+                CurrentProgress = 0;
 
-            var productList = await GetProductListAsync(token);
-            var uniqueDirs = Directory.GetDirectories(allProducts);
+                WriteLog(log, "Starting ...");
 
-            var uniqueProducts = productList
-                .Where(x => !string.IsNullOrWhiteSpace(x.Title))
-                .Select(x => SafeFilename(x.Title))
-                .Distinct()
-                .ToDictionary(x => x);
-            
-            foreach(var dir in uniqueDirs)
-            {
-                var dirName = new DirectoryInfo(dir).Name;
-                
-                if (!uniqueProducts.ContainsKey(dirName))
+                _processedProduct = new HashSet<string>();
+                _productsAdded = new ConcurrentBag<string>();
+                _productsUpdated = new ConcurrentBag<string>();
+                _productsDeleted = new ConcurrentBag<string>();
+                _productsError = new ConcurrentBag<string>();
+
+                RecordErrorAction = (x) =>
                 {
-                    _log.Information($"Deleted {dirName}");
-                    _productsDeleted.Add(dir);
-                    Directory.Delete(dir, true);
+                    WriteLog(log, x);
+                    _productsError.Add(x);
+                };
+
+                source = new CancellationTokenSource();
+                var token = source.Token;
+
+                var productList = await GetProductListAsync(token);
+                var uniqueDirs = Directory.GetDirectories(allProducts);
+
+                var uniqueProducts = productList
+                    .Where(x => !string.IsNullOrWhiteSpace(x.Title))
+                    .Select(x => SafeFilename(x.Title))
+                    .Distinct()
+                    .ToDictionary(x => x);
+
+                foreach (var dir in uniqueDirs)
+                {
+                    var dirName = new DirectoryInfo(dir).Name;
+
+                    if (!uniqueProducts.ContainsKey(dirName))
+                    {
+                        _log.Information($"Deleted {dirName}");
+                        _productsDeleted.Add(dir);
+                        Directory.Delete(dir, true);
+                    }
+                }
+
+                MaxProgress = productList.Count;
+                CurrentProgress = 0;
+
+                foreach (var p in productList)
+                {
+                    CurrentProgress++;
+
+                    ProgressText = $"({CurrentProgress.ToString("D3")}/{(MaxProgress).ToString("D3")}) Processing '{p.Id} - {p.Title}' ...";
+
+                    var errorDir = await ProcessProductAsync(p, token);
+
+                    if (!string.IsNullOrWhiteSpace(errorDir) && Directory.Exists(errorDir))
+                        Directory.Delete(errorDir, true);
+
+                    if (token.IsCancellationRequested)
+                        break;
+                }
+
+                if (!token.IsCancellationRequested)
+                {
+                    CurrentProgress = MaxProgress;
+                    ProgressText = $"({(MaxProgress).ToString("D3")}/{(MaxProgress).ToString("D3")}) Finished.";
+                    WriteLog(log, $"finished with {_productsAdded.Count} products added, {_productsUpdated.Count} updated, {_productsDeleted.Count} deleted, {_productsError.Count} errors.");
+                }
+                else
+                {
+                    ProgressText = $"({CurrentProgress.ToString("D3")}/{(MaxProgress).ToString("D3")}) Canceled by user.";
+                    WriteLog(log, "Canceled by user.");
                 }
             }
-
-            MaxProgress = productList.Count;
-            CurrentProgress = 0;
-            
-            foreach(var p in productList)
+            catch(Exception ex)
             {
-                CurrentProgress++;
-
-                ProgressText = $"({CurrentProgress.ToString("D3")}/{(MaxProgress).ToString("D3")}) Processing '{p.Id} - {p.Title}' ...";
-
-                var errorDir = await ProcessProductAsync(p, token);
-
-                if(!string.IsNullOrWhiteSpace(errorDir) && Directory.Exists(errorDir))
-                    Directory.Delete(errorDir, true);
-
-                if (token.IsCancellationRequested)
-                    break;
-            }
-
-            if(!token.IsCancellationRequested)
-            { 
-                CurrentProgress = MaxProgress;
-                ProgressText = $"({(MaxProgress).ToString("D3")}/{(MaxProgress).ToString("D3")}) Finished.";
-                WriteLog(log, $"finished with {_productsAdded.Count} products added, {_productsUpdated.Count} updated, {_productsDeleted.Count} deleted, {_productsError.Count} errors.");
-            }
-            else
-            {
-                ProgressText = $"({CurrentProgress.ToString("D3")}/{(MaxProgress).ToString("D3")}) Canceled by user.";
-                WriteLog(log, "Canceled by user.");
+                _log.Error(ex.ToString());
+                await _dialogService.ShowErrorAsync(ex.ToString());
             }
 
             GetProductsButtonText = "Get Products";
@@ -337,7 +346,6 @@ namespace XmlFeedReader.ViewModels
             }
 
             var productDir = Path.Combine(OutputRootFolder, ProductsDir, safeProductTitle);
-            var lastmodFile = Path.Combine(OutputRootFolder, ProductsDir, ".lastmod");
 
             var priceFloat = default(float);
 
@@ -363,10 +371,8 @@ namespace XmlFeedReader.ViewModels
             {
                 isModified = true;
                 
-                var lastmodText = "";
-                if(File.Exists(lastmodFile))
-                    lastmodText = File.ReadAllText(lastmodFile);
-
+                var lastmodText = Directory.GetCreationTime(productDir).ToString("yyyy-MM-dd HH:mm:ss");
+                
                 if (string.IsNullOrWhiteSpace(p.LastModified))
                 {
                     Directory.Delete(productDir, true);
@@ -384,13 +390,24 @@ namespace XmlFeedReader.ViewModels
 
             Directory.CreateDirectory(productDir);
 
+            DateTime lastModDate = DateTime.Now;
+
             if (!string.IsNullOrWhiteSpace(p.LastModified))
             {
-                File.WriteAllText(lastmodFile, p.LastModified);
+                try
+                {
+                    lastModDate
+                        = DateTime.ParseExact(p.LastModified, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                    
+                }
+                catch(Exception ex)
+                {
+                    _log.Error(ex.ToString());
+                }
             }
 
             int price = IsPriceRounding ? (int)Math.Round(priceFloat) : (int)Math.Floor(priceFloat);
-            var productFile = Path.Combine(productDir, $"{price}.txt");
+            var productDescriptionFile = Path.Combine(productDir, $"{price}.txt");
 
             var prodict = p.ToDictionary();
             var description = string.Join("", DescriptionStart, p.Description, DescriptionEnd);
@@ -400,7 +417,11 @@ namespace XmlFeedReader.ViewModels
                 description = description.Replace(kv.Key, kv.Value);
             }
 
-            File.WriteAllText(productFile, description);
+            File.WriteAllText(productDescriptionFile, description);
+
+            File.SetCreationTime(productDescriptionFile, lastModDate);
+            File.SetLastAccessTime(productDescriptionFile, lastModDate);
+            File.SetLastWriteTime(productDescriptionFile, lastModDate);
 
             var imageDownloadList = new Dictionary<char, string>();
             var key = 'A';
@@ -440,6 +461,10 @@ namespace XmlFeedReader.ViewModels
                         File.Delete(targetFilename);
 
                     File.Move(tmp, targetFilename);
+
+                    File.SetCreationTime(targetFilename, lastModDate);
+                    File.SetLastAccessTime(targetFilename, lastModDate);
+                    File.SetLastWriteTime(targetFilename, lastModDate);
                 }
                 catch (Exception ex)
                 {
@@ -464,6 +489,10 @@ namespace XmlFeedReader.ViewModels
                 _productsUpdated.Add($"{p.Id} - {p.Title}");
             else
                 _productsAdded.Add($"{p.Id} - {p.Title}");
+
+            Directory.SetCreationTime(productDir, lastModDate);
+            Directory.SetLastAccessTime(productDir, lastModDate);
+            Directory.SetLastWriteTime(productDir, lastModDate);
 
             return string.Empty;
         }

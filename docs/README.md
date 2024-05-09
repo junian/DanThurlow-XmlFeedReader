@@ -1,7 +1,8 @@
-# XML FEED READER APP
+# Woo Product XML FEED READER APP
 
 We need an app to run on Windows that reads product data from an XML feed and creates product folders, text files and images on my desktop PC (see format below). 
 
+Example feed: https://www.ladybirdnursery.com.au/wp-content/uploads/woo-product-feed-pro/xml/m3EDdze9VLOhIHtIJaoqjisTPppFhqFH.xml
 
 ## DIRECTORY STRUCTURE
 

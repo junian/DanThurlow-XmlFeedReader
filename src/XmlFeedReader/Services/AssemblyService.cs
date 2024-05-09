@@ -14,7 +14,13 @@ namespace XmlFeedReader.Services
 
         public static AssemblyService Current => _current;
 
-        private AssemblyService() { }
+        private readonly Assembly _assembly;
+        public AssemblyService(Assembly assembly = null) 
+        {
+            _assembly = Assembly.GetExecutingAssembly();
+            if (assembly != null)
+                _assembly = assembly;
+        }
 
         #region Assembly Attribute Accessors
 
@@ -22,12 +28,17 @@ namespace XmlFeedReader.Services
         {
             get => GetStringAttribute<AssemblyTitleAttribute>(
                 x => x?.Title,
-                System.IO.Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().CodeBase));
+                System.IO.Path.GetFileNameWithoutExtension(_assembly.CodeBase));
+        }
+
+        public Version AssemblyFullVersion
+        {
+            get => _assembly.GetName().Version;
         }
 
         public string AssemblyVersion
         {
-            get => Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
+            get => _assembly.GetName().Version.ToString(3);
         }
 
         public string AssemblyDescription
@@ -55,9 +66,14 @@ namespace XmlFeedReader.Services
             get => GetStringAttribute<GuidAttribute>(x => x?.Value);
         }
 
+        public string AssemblyBuildConfiguration
+        {
+            get => GetStringAttribute<AssemblyConfigurationAttribute>(x => x?.Configuration);
+        }
+
         private string GetStringAttribute<T>(Func<T, string> getStringFunc, string defaultValue = "")
         {
-            var attr = (T)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(T), false)?.FirstOrDefault();
+            var attr = (T)_assembly.GetCustomAttributes(typeof(T), false)?.FirstOrDefault();
             return getStringFunc?.Invoke(attr) ?? defaultValue;
         }
 

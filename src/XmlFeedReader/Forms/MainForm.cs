@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +22,15 @@ namespace XmlFeedReader.Forms
             InitializeComponent();
             this.WhenActivated(block =>
             {
+                var configPath = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath;
+                if (!File.Exists(configPath))
+                {
+                    //Existing user config does not exist, so load settings from previous assembly
+                    Settings.Default.Upgrade();
+                    Settings.Default.Reload();
+                    Settings.Default.Save();
+                }
+
                 ViewModel.SafeAction = (action) =>
                 {
                     if (this.IsDisposed)

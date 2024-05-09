@@ -12,6 +12,7 @@ using System.Linq;
 using System.Net;
 using System.Reactive;
 using System.Security.Policy;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -383,7 +384,7 @@ namespace XmlFeedReader.ViewModels
                 }
                 else
                 {
-                    _log.Information($"Skipping {p.Id} - {p.Title} ...");
+                    //_log.Information($"Skipping {p.Id} - {p.Title} ...");
                     return string.Empty;
                 }
             }
@@ -409,12 +410,19 @@ namespace XmlFeedReader.ViewModels
             int price = IsPriceRounding ? (int)Math.Round(priceFloat) : (int)Math.Floor(priceFloat);
             var productDescriptionFile = Path.Combine(productDir, $"{price}.txt");
 
-            var prodict = p.ToDictionary();
+            //_log.Information("Find and replace");
             var description = string.Join("", DescriptionStart, p.Description, DescriptionEnd);
 
-            foreach(var kv in prodict)
+            string pattern = @"\<product_(.*?)\>";
+            string replacement = "$1";
+            var matches = Regex.Matches(description, pattern);
+            
+            foreach (Match m in matches)
             {
-                description = description.Replace(kv.Key, kv.Value);
+                var xmlKey = m.Value;
+                var xmlDictKey = m.Result(replacement);
+                var replace = HtmlDecode(p.GetValue(xmlDictKey));
+                description = description.Replace(xmlKey, replace);
             }
 
             File.WriteAllText(productDescriptionFile, description);
@@ -532,6 +540,7 @@ namespace XmlFeedReader.ViewModels
                         Visibility = HtmlDecode((string)p?.Element("visibility")),
                         Virtual = HtmlDecode((string)p?.Element("virtual")),
                         LastModified = HtmlDecode((string)p?.Element("last_modified")),
+                        Xml = p,
                     };
 
                     

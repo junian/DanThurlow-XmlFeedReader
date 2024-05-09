@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace XmlFeedReader.Models
 {
@@ -35,21 +36,19 @@ namespace XmlFeedReader.Models
 
         public string LastModified { get; set; }
 
-        public Dictionary<string, string> ToDictionary()
+        public XElement Xml { get; set; }
+
+        public string GetValue(string key)
         {
-            var dict = new Dictionary<string, string>
-            {
-                ["<product_id>"] = Id,
-                ["<product_title>"] = Title,
-                ["<product_description>"] = Description,
-                ["<product_link>"] = Link,
-                ["<product_image_link>"] = ImageLink,
-                ["<product_price>"] = Price,
-                ["<product_availability>"] = Availability,
-                ["<product_stock_level>"] = StockLevel,
-                ["<product_last_modified>"] = LastModified,
-            };
-            return dict;
+
+            var value = Xml?.Element(key);
+            if (value == null)
+                return string.Empty;
+
+            if (value.HasElements)
+                return string.Empty;
+
+            return (string)value;
         }
 
     }

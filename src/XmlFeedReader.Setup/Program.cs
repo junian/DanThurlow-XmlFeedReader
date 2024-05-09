@@ -71,6 +71,7 @@ namespace XmlFeedReader.Setup
             Compiler.EmitRelativePaths = false;
 
             project.BuildMsi(path: $@".\bin\{assembly.AssemblyBuildConfiguration}\{TargetFramework}\{assembly.AssemblyTitle}-v{assembly.AssemblyVersion}.msi");
+        
         }
     }
 }
